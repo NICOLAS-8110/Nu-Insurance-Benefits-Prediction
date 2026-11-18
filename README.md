@@ -5,67 +5,65 @@
 ## 📋 Descripción
 Las compañías de seguros administran información personal, familiar y financiera clave para comprender mejor a sus clientes, identificar perfiles similares y desarrollar modelos predictivos que apoyen la toma de decisiones estratégicas.
 
-En este proyecto se analizan datos históricos de clientes de la aseguradora **Sure Tomorrow** mediante técnicas de **Machine Learning**, algoritmos de **vecinos más cercanos (k-NN)** y **álgebra lineal**, abordando cuatro necesidades críticas de negocio:
+En este proyecto se analizan datos históricos de 5,000 clientes de la aseguradora **Sure Tomorrow** mediante técnicas de **Machine Learning**, algoritmos de **vecinos más cercanos (k-NN)** y **álgebra lineal**, abordando cuatro necesidades críticas de negocio:
 1. Encontrar clientes con características similares.
 2. Predecir si un cliente recibirá beneficios de seguro.
 3. Estimar la cantidad de beneficios que podría recibir.
 4. Proteger los datos personales mediante ofuscación matricial sin afectar el desempeño predictivo.
 
 ## 🎯 Objetivos
-- ✅ Examinar la estructura, calidad, valores ausentes y duplicados del conjunto de datos.
-- ✅ Encontrar clientes similares mediante el algoritmo **k-Nearest Neighbors (k-NN)** analizando el impacto del escalado y las métricas de distancia (Euclidiana vs. Manhattan).
-- ✅ Construir una variable objetivo binaria y entrenar un modelo de clasificación evaluado con la métrica **F1 Score** frente a modelos aleatorios de referencia.
+- ✅ Examinar la estructura, calidad y tipos de datos del conjunto de 5,000 clientes.
+- ✅ Encontrar clientes similares mediante el algoritmo **k-Nearest Neighbors (k-NN)** analizando el impacto del escalado (`MaxAbsScaler`) y las métricas de distancia (Euclidiana vs. Manhattan).
+- ✅ Construir una variable objetivo binaria y entrenar un modelo de clasificación evaluado con la métrica **F1 Score** ($k=1\dots10$) frente a modelos aleatorios de referencia (*Dummy*).
 - ✅ Implementar una **Regresión Lineal personalizada** desde cero mediante álgebra matricial para predecir la cantidad de beneficios, evaluada con **RMSE** y **$R^2$**.
-- ✅ Desarrollar un método de **ofuscación de datos** con matrices invertibles, demostrando matemáticamente y en la práctica que conserva intacta la calidad del modelo.
+- ✅ Desarrollar un método de **ofuscación de datos** con matrices invertibles, demostrando analítica y computacionalmente que conserva intacta la calidad del modelo.
 
 ## 🛠️ Herramientas y Habilidades Utilizadas
 * **Lenguaje:** Python
-* **Librerías:** Pandas, NumPy, Scikit-Learn, Matplotlib y Seaborn
-* **Entorno:** Jupyter Notebook / Google Colab
-* **Técnicas:** Vecinos Más Cercanos (k-NN), Escalado de características (`MaxAbsScaler` / `StandardScaler`), Clasificación supervisada, Álgebra Lineal Matricial, Regresión Lineal y Ofuscación de Datos.
+* **Librerías:** Pandas, NumPy, Scikit-Learn y Seaborn
+* **Entorno:** Jupyter Notebook (`Nu___Insurance_Benefits_Prediction_and_Data_Protection.ipynb`)
+* **Técnicas:** Vecinos Más Cercanos (k-NN), Escalado de características (`MaxAbsScaler` y `StandardScaler`), Clasificación supervisada, Álgebra Lineal Matricial, Regresión Lineal y Ofuscación de Datos.
 
 ## 📊 Fuente de Datos y Variables
-El análisis utiliza el dataset histórico `insurance_us.csv`:
+El análisis utiliza el dataset histórico `insurance_us.csv` (5,000 registros sin valores nulos):
 | Variable | Descripción |
 | :--- | :--- |
-| `gender` | Género registrado del cliente |
-| `age` | Edad del cliente |
+| `gender` | Género registrado del cliente (`0` o `1`) |
+| `age` | Edad del cliente (convertida a entero) |
 | `income` | Ingresos anuales estimados |
 | `family_members` | Número de familiares del cliente |
 | `insurance_benefits` | Cantidad de beneficios de seguro recibidos (variable objetivo) |
 
-## ⚙️ Metodología y Tareas Desarrolladas
+## ⚙️ Metodología y Resultados Obtenidos
 
-### 1. Preparación y Análisis Exploratorio (EDA)
-Inspección de dimensiones, normalización de columnas, revisión de duplicados y análisis de distribuciones. Se identificó una fuerte diferencia de escala entre variables (por ejemplo, `income` frente a `age` o `family_members`), factor crítico para modelos basados en distancias.
+### 1. Tarea 1: Búsqueda de Clientes Similares (k-NN)
+Aplicación de *NearestNeighbors* comparando datos originales vs. datos escalados (`MaxAbsScaler`) bajo distancias **Euclidiana** y **Manhattan**:
+* **Hallazgo clave:** Sin escalado, la variable `income` (decenas de miles) domina por completo el cálculo de distancias. Al escalar los datos, los vecinos seleccionados cambian por completo (de `[0, 2022, 1225, 4031, 3424]` a `[0, 2689, 133, 4869, 3365]`), permitiendo que la edad, el género y el tamaño familiar participen equilibradamente.
 
-### 2. Tarea 1: Búsqueda de Clientes Similares (k-NN)
-Aplicación del algoritmo *k-Nearest Neighbors* comparando datos originales vs. datos escalados bajo distancias **Euclidiana** y **Manhattan**:
-* **Hallazgo clave:** Sin escalado, los ingresos dominan por completo el cálculo de distancias. Al estandarizar los datos, todas las variables participan equilibradamente en la identificación de perfiles similares.
+### 2. Tarea 2: Predicción de Recepción de Beneficios (Clasificación)
+Transformación de `insurance_benefits` en una variable binaria (`0`: 4,436 clientes sin beneficios; `1`: 564 clientes con beneficios) y partición **70:30** (`random_state=12345`):
+* **Modelo Aleatorio (Dummy):** Alcanzó un techo máximo de referencia de **F1 = 0.20** (para probabilidades $p=0.50$ y $p=1.00$).
+* **kNN sin escalar:** Desempeño deficiente e inestable que cae desde **F1 = 0.6071** ($k=1$) hasta **F1 = 0.0000** ($k=10$).
+* **kNN con datos escalados (`StandardScaler`):** Rendimiento sobresaliente, alcanzando un pico máximo de **F1 = 0.9571** ($k=1$) y manteniéndose por encima de **0.88** para todos los valores de $k$ hasta 10.
 
-### 3. Tarea 2: Predicción de Recepción de Beneficios (Clasificación)
-Transformación de `insurance_benefits` en una variable objetivo binaria (`0` = sin beneficios, `1` = recibió uno o más beneficios) para entrenar un clasificador k-NN evaluado mediante **F1 Score**, superando significativamente el rendimiento de modelos aleatorios de referencia.
-
-### 4. Tarea 3: Estimación de Beneficios (Regresión Lineal Matricial)
-Implementación de una clase personalizada de Regresión Lineal utilizando operaciones de álgebra lineal para calcular los pesos ($w$) y predicciones ($\hat{y}$):
+### 3. Tarea 3: Estimación de Beneficios (Regresión Lineal Matricial)
+Implementación de la clase `MyLinearRegression` mediante operaciones de álgebra lineal:
 $$w = (X^T X)^{-1} X^T y \qquad \hat{y} = Xw$$
-Evaluada mediante las métricas **RMSE** (magnitud promedio del error) y **$R^2$** (proporción de variabilidad explicada).
+* **Resultados (Original vs. Escalado):** Tanto con los datos originales como con los escalados, el modelo obtuvo exactamente las mismas métricas: **RMSE = 0.34** y **$R^2$ = 0.66**, demostrando que el escalado ajusta proporcionalmente los pesos sin alterar las predicciones.
 
-### 5. Tarea 4: Protección de Datos Personales (Ofuscación Matricial)
-Transformación de la matriz de características original $X$ multiplicándola por una matriz invertible aleatoria $P$:
+### 4. Tarea 4: Protección de Datos Personales (Ofuscación Matricial)
+Transformación de la matriz de características $X$ multiplicándola por una matriz aleatoria invertible $P$:
 $$X' = X P \qquad \text{Recuperación:} \quad X = X' P^{-1}$$
-Dado que los pesos del modelo transformado cumplen $w' = P^{-1}w$, se demuestra algebraicamente que las predicciones permanecen idénticas:
-$$X'w' = (XP)(P^{-1}w) = X(PP^{-1})w = Xw$$
-* **Validación:** La comparación entre datos originales y ofuscados confirmó que tanto las predicciones como los valores de **RMSE** y **$R^2$** se mantienen inalterados, protegiendo la privacidad de los clientes sin sacrificar capacidad analítica.
-
-## 💡 Principales Hallazgos
-* **Importancia del escalado:** En algoritmos basados en distancia, omitir la normalización sesga los resultados hacia variables de mayor magnitud numérica como los ingresos.
-* **Álgebra lineal aplicada:** Es posible construir modelos de regresión lineal exactos y verificables mediante operaciones matriciales directas.
-* **Privacidad sin pérdida de rendimiento:** La transformación mediante matrices invertibles oculta eficazmente la información sensible de los clientes manteniendo intacta la precisión del modelo predictivo.
+Dado que los pesos del modelo transformado cumplen $w_P = P^{-1}w$, se demostró analíticamente que las predicciones son idénticas:
+$$\hat{y}_P = (XP)(P^{-1}w) = X(PP^{-1})w = Xw = \hat{y}$$
+* **Validación computacional:** Al entrenar `MyLinearRegression` con los datos ofuscados $X'$, se obtuvieron exactamente las mismas métricas que con los datos originales (**RMSE = 0.34** y **$R^2$ = 0.66**), garantizando privacidad sin pérdida de calidad predictiva.
 
 ## 📂 Archivos Principales
 * `Nu___Insurance_Benefits_Prediction_and_Data_Protection.ipynb`
 * `insurance_us.csv`
+
+## 🏁 Conclusión
+El proyecto demostró cómo integrar **Machine Learning** y **álgebra lineal** para resolver múltiples retos operativos de **Sure Tomorrow**. Desde la identificación precisa de perfiles similares mediante k-NN escalado y la clasificación de probabilidad de beneficios (**F1 = 0.9571**), hasta la regresión lineal matricial con **ofuscación de datos** (**RMSE = 0.34**, **$R^2$ = 0.66**), se comprobó que es totalmente viable proteger la privacidad de los clientes sin comprometer el rendimiento de los modelos predictivos.
 
 ## 🏁 Conclusión
 El proyecto demostró cómo integrar técnicas de **Machine Learning** y **álgebra lineal** para resolver múltiples retos operativos de la aseguradora **Sure Tomorrow**. Desde la segmentación de clientes similares mediante k-NN escalado y la clasificación de probabilidad de beneficios, hasta la implementación matricial de regresión lineal con **ofuscación de datos**, se comprobó que es totalmente viable proteger la privacidad de la información personal sin comprometer la calidad ni la exactitud de los modelos predictivos.
