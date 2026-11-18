@@ -64,6 +64,3 @@ $$\hat{y}_P = (XP)(P^{-1}w) = X(PP^{-1})w = Xw = \hat{y}$$
 
 ## 🏁 Conclusión
 El proyecto demostró cómo integrar **Machine Learning** y **álgebra lineal** para resolver múltiples retos operativos de **Sure Tomorrow**. Desde la identificación precisa de perfiles similares mediante k-NN escalado y la clasificación de probabilidad de beneficios (**F1 = 0.9571**), hasta la regresión lineal matricial con **ofuscación de datos** (**RMSE = 0.34**, **$R^2$ = 0.66**), se comprobó que es totalmente viable proteger la privacidad de los clientes sin comprometer el rendimiento de los modelos predictivos.
-
-## 🏁 Conclusión
-El proyecto demostró cómo integrar técnicas de **Machine Learning** y **álgebra lineal** para resolver múltiples retos operativos de la aseguradora **Sure Tomorrow**. Desde la segmentación de clientes similares mediante k-NN escalado y la clasificación de probabilidad de beneficios, hasta la implementación matricial de regresión lineal con **ofuscación de datos**, se comprobó que es totalmente viable proteger la privacidad de la información personal sin comprometer la calidad ni la exactitud de los modelos predictivos.
